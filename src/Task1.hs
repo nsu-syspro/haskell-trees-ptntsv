@@ -84,10 +84,16 @@ forder ::
   Forest a ->
   -- | List of values in specified tree order
   [a]
-forder _ _ _ [] = []
-forder ord _ lval [x] = torder ord lval x
-forder ord msep lval (x : xs) = torder ord lval x ++ sep ++ forder ord msep lval xs
-  where
-    sep = case msep of
-      Just s -> [s]
-      Nothing -> []
+forder ord msep lval forest = intercalate (maybeToList msep) (map (torder ord lval) forest)
+
+maybeToList :: Maybe a -> [a]
+maybeToList (Just x) = [x]
+maybeToList Nothing = []
+
+intersperse :: a -> [a] -> [a]
+intersperse _ [] = []
+intersperse _ [x] = [x]
+intersperse sep (x : xs) = [x, sep] ++ intersperse sep xs
+
+intercalate :: [a] -> [[a]] -> [a]
+intercalate xs xss = concat (intersperse xs xss)
