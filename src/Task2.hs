@@ -140,7 +140,12 @@ tinsert cmp x (Branch val l r)
 -- Leaf
 tdelete :: Cmp a -> a -> Tree a -> Tree a
 tdelete _ _ Leaf = Leaf
-tdelete cmp x (Branch val l r)
-  | cmp x val == EQ = listToBST cmp (bstToList l ++ bstToList r) -- cinema
-  | cmp x val == LT = Branch val (tdelete cmp x l) r
-  | otherwise = Branch val l (tdelete cmp x r)
+tdelete cmp x (Branch val l r) =
+  case cmp x val of
+    EQ -> hangLeftmost l r
+    LT -> Branch val (tdelete cmp x l) r
+    GT -> Branch val l (tdelete cmp x r)
+  where
+    hangLeftmost :: Tree a -> Tree a -> Tree a
+    hangLeftmost src Leaf = src
+    hangLeftmost src (Branch val' l' r') = Branch val' (hangLeftmost src l') r'
