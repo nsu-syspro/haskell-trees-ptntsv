@@ -121,10 +121,10 @@ tlookup cmp needle (Branch val l r)
 -- Branch 'a' Leaf Leaf
 tinsert :: Cmp a -> a -> Tree a -> Tree a
 tinsert _ x Leaf = Branch x Leaf Leaf
-tinsert cmp x (Branch val l r)
-  | cmp x val == EQ = Branch x l r
-  | cmp x val == LT = Branch val (tinsert cmp x l) r
-  | otherwise = Branch val l (tinsert cmp x r)
+tinsert cmp x (Branch val l r) = case cmp x val of
+  EQ -> Branch x l r
+  LT -> Branch val (tinsert cmp x l) r
+  GT -> Branch val l (tinsert cmp x r)
 
 -- | Deletes given value from given binary search tree
 -- preserving its BST properties with respect to given comparison

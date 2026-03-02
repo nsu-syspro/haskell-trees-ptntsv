@@ -44,23 +44,10 @@ torder ::
   [a]
 torder _ Nothing Leaf = []
 torder _ (Just lval) Leaf = [lval]
-torder PreOrder lval (Branch val l r) = [val] ++ torder PreOrder lval l ++ torder PreOrder lval r
-torder InOrder lval (Branch val l r) = torder InOrder lval l ++ [val] ++ torder InOrder lval r
-torder PostOrder lval (Branch val l r) = torder PostOrder lval l ++ torder PostOrder lval r ++ [val]
-
--- This one has less copypaste but longer
-torder' :: Order -> Maybe a -> Tree a -> [a]
-torder' _ Nothing Leaf = []
-torder' _ (Just lval) Leaf = [lval]
-torder' order lval (Branch val l r) = concat ordering
-  where
-    llist = torder order lval l
-    rlist = torder order lval r
-    ordering =
-      case order of
-        PreOrder -> [[val], llist, rlist]
-        InOrder -> [llist, [val], rlist]
-        PostOrder -> [llist, rlist, [val]]
+torder order lval (Branch val l r) = case order of
+  PreOrder -> [val] ++ torder PreOrder lval l ++ torder PreOrder lval r
+  InOrder -> torder InOrder lval l ++ [val] ++ torder InOrder lval r
+  PostOrder -> torder PostOrder lval l ++ torder PostOrder lval r ++ [val]
 
 -- | Returns values of given 'Forest' separated by optional separator
 -- where each 'Tree' is traversed in specified 'Order' with optional leaf value
